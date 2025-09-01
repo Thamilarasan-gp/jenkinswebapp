@@ -1,11 +1,428 @@
-<html>
-    <head>
-        <title>Sample Website</title>
-    </head>
-    <body style="text-align:center;font-family:Verdana;margin:1%;">
-        <h1 style="color:navy">Welcome to Our Website!</h1>
-        <hr>
-        <p>This is a simple, static website that we deploy by creating a pipeline on AWS CodePipeline.</p>
-        <h2>Website Version: 2.0</h2>
-    </body>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ParkEase - Smart Parking System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            color: #333;
+        }
+        
+        header {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 1rem 2rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .logo i {
+            font-size: 2.5rem;
+            color: #2d5bfd;
+        }
+        
+        .logo h1 {
+            font-weight: 700;
+            font-size: 1.8rem;
+            color: #2d5bfd;
+        }
+        
+        .container {
+            display: flex;
+            flex: 1;
+            padding: 2rem;
+            gap: 2rem;
+        }
+        
+        .parking-lot {
+            flex: 2;
+            background: rgba(255, 255, 255, 0.85);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        
+        .parking-title {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+        }
+        
+        .parking-title h2 {
+            font-size: 1.5rem;
+            color: #2d5bfd;
+        }
+        
+        .parking-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+        }
+        
+        .parking-space {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 1.5rem 1rem;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease;
+        }
+        
+        .parking-space:hover {
+            transform: translateY(-5px);
+        }
+        
+        .parking-space.occupied {
+            background: #ffcdd2;
+        }
+        
+        .parking-space.available {
+            background: #c8e6c9;
+        }
+        
+        .parking-space.reserved {
+            background: #ffe0b2;
+        }
+        
+        .space-number {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .space-status {
+            font-size: 0.9rem;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            display: inline-block;
+            margin-bottom: 1rem;
+        }
+        
+        .available .space-status {
+            background: #4caf50;
+            color: white;
+        }
+        
+        .occupied .space-status {
+            background: #f44336;
+            color: white;
+        }
+        
+        .reserved .space-status {
+            background: #ff9800;
+            color: white;
+        }
+        
+        .car-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            color: #555;
+        }
+        
+        .controls {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.85);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        
+        .controls h2 {
+            font-size: 1.5rem;
+            color: #2d5bfd;
+            margin-bottom: 1.5rem;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 1.2rem;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+        
+        .stat-card h3 {
+            font-size: 2rem;
+            color: #2d5bfd;
+        }
+        
+        .stat-card p {
+            font-size: 0.9rem;
+            color: #666;
+        }
+        
+        .search-form {
+            margin-bottom: 2rem;
+        }
+        
+        .search-form h3 {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            color: #444;
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #555;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+        
+        button {
+            background: #2d5bfd;
+            color: white;
+            border: none;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: background 0.3s ease;
+        }
+        
+        button:hover {
+            background: #1a49e0;
+        }
+        
+        .action-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+        
+        .action-buttons button {
+            padding: 0.8rem;
+        }
+        
+        .action-buttons button.reserve {
+            background: #ff9800;
+        }
+        
+        .action-buttons button.reserve:hover {
+            background: #f57c00;
+        }
+        
+        .action-buttons button.checkout {
+            background: #4caf50;
+        }
+        
+        .action-buttons button.checkout:hover {
+            background: #388e3c;
+        }
+        
+        footer {
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            text-align: center;
+            padding: 1.5rem;
+            margin-top: auto;
+        }
+        
+        @media (max-width: 900px) {
+            .container {
+                flex-direction: column;
+            }
+            
+            .parking-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+        
+        @media (max-width: 600px) {
+            .parking-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .stats {
+                grid-template-columns: 1fr;
+            }
+            
+            .action-buttons {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <i class="fas fa-parking"></i>
+            <h1>ParkEase</h1>
+        </div>
+        <div class="user">
+            <i class="fas fa-user-circle"></i>
+            Admin
+        </div>
+    </header>
+    
+    <div class="container">
+        <div class="parking-lot">
+            <div class="parking-title">
+                <h2>Parking Spaces</h2>
+                <div class="time">10:45 AM</div>
+            </div>
+            
+            <div class="parking-grid">
+                <!-- Parking spaces will be generated by JavaScript -->
+            </div>
+        </div>
+        
+        <div class="controls">
+            <h2>Parking Control</h2>
+            
+            <div class="stats">
+                <div class="stat-card">
+                    <h3>12</h3>
+                    <p>Total Spaces</p>
+                </div>
+                <div class="stat-card">
+                    <h3>8</h3>
+                    <p>Available</p>
+                </div>
+                <div class="stat-card">
+                    <h3>3</h3>
+                    <p>Occupied</p>
+                </div>
+                <div class="stat-card">
+                    <h3>1</h3>
+                    <p>Reserved</p>
+                </div>
+            </div>
+            
+            <div class="search-form">
+                <h3>Find Parking Space</h3>
+                <div class="form-group">
+                    <label for="licensePlate">License Plate</label>
+                    <input type="text" id="licensePlate" placeholder="Enter license plate">
+                </div>
+                <button type="button">Search Vehicle</button>
+            </div>
+            
+            <div class="action-buttons">
+                <button class="reserve">Reserve Space</button>
+                <button class="checkout">Checkout Vehicle</button>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <p>&copy; 2023 ParkEase - Smart Parking System | Designed for efficiency and convenience</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const parkingGrid = document.querySelector('.parking-grid');
+            const timeElement = document.querySelector('.time');
+            
+            // Generate parking spaces
+            for (let i = 1; i <= 12; i++) {
+                const space = document.createElement('div');
+                space.classList.add('parking-space');
+                
+                // Randomly assign status
+                const status = Math.random();
+                if (status < 0.25) {
+                    space.classList.add('occupied');
+                } else if (status < 0.35) {
+                    space.classList.add('reserved');
+                } else {
+                    space.classList.add('available');
+                }
+                
+                space.innerHTML = `
+                    <div class="space-number">${i}</div>
+                    <div class="space-status">${space.classList.contains('occupied') ? 'Occupied' : space.classList.contains('reserved') ? 'Reserved' : 'Available'}</div>
+                    <div class="car-icon"><i class="fas fa-car"></i></div>
+                    <div class="space-info">${space.classList.contains('occupied') ? 'AB123CD' : space.classList.contains('reserved') ? 'Reserved' : 'Free'}</div>
+                `;
+                
+                parkingGrid.appendChild(space);
+            }
+            
+            // Update time
+            function updateTime() {
+                const now = new Date();
+                timeElement.textContent = now.toLocaleTimeString();
+            }
+            
+            updateTime();
+            setInterval(updateTime, 60000);
+            
+            // Add interactivity to parking spaces
+            const parkingSpaces = document.querySelectorAll('.parking-space');
+            parkingSpaces.forEach(space => {
+                space.addEventListener('click', function() {
+                    if (this.classList.contains('available')) {
+                        alert(`Space ${this.querySelector('.space-number').textContent} is available. Would you like to reserve it?`);
+                    } else if (this.classList.contains('occupied')) {
+                        alert(`Space ${this.querySelector('.space-number').textContent} is occupied by vehicle ${this.querySelector('.space-info').textContent}.`);
+                    } else if (this.classList.contains('reserved')) {
+                        alert(`Space ${this.querySelector('.space-number').textContent} is reserved.`);
+                    }
+                });
+            });
+            
+            // Add functionality to buttons
+            document.querySelector('.reserve').addEventListener('click', function() {
+                const availableSpaces = document.querySelectorAll('.parking-space.available');
+                if (availableSpaces.length > 0) {
+                    const randomSpace = availableSpaces[Math.floor(Math.random() * availableSpaces.length)];
+                    alert(`Space ${randomSpace.querySelector('.space-number').textContent} has been reserved for you!`);
+                } else {
+                    alert('Sorry, no available spaces at the moment.');
+                }
+            });
+            
+            document.querySelector('.checkout').addEventListener('click', function() {
+                const licensePlate = document.getElementById('licensePlate').value;
+                if (licensePlate) {
+                    alert(`Vehicle ${licensePlate} has been checked out. Thank you!`);
+                } else {
+                    alert('Please enter a license plate number.');
+                }
+            });
+        });
+    </script>
+</body>
 </html>
